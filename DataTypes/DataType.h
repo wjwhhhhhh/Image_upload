@@ -8,5 +8,7 @@ namespace upload
         DataType_DataFlow_ImageFile=1,
 
         DataType_DataRead_Image=100,
+
+        DataType_OriginalData_Image=200,
     };
 } // namespace upload

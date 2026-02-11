@@ -4,11 +4,11 @@
 #include <string>
 namespace upload
 {
-    struct IDataReadImage : public IData
+    struct DataReadImage : public IData
     {
     public:
-        explicit IDataReadImage(const std::string& filepath) : IData(DataType::DataType_DataRead_Image), filepath_(filepath) {}
-        virtual ~IDataReadImage() = default;
+        explicit DataReadImage(const std::string& filepath) : IData(DataType::DataType_DataRead_Image), filepath_(filepath) {}
+        virtual ~DataReadImage() = default;
         const std::string filepath_;
     };
 }

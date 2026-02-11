@@ -1,6 +1,8 @@
 # 编译输出
 build/
 bin/
+cmake-build-debug/
+deps/
 *.exe
 *.out
 *.app
