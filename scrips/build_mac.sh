@@ -10,6 +10,8 @@ DEPS_DIR="deps"
 # 定义依赖版本
 OPENSSL_VERSION="3.1.4"
 POCO_VERSION="1.12.4"
+NEED_BUILD_OPENSSL="FALSE"
+NEED_BUILD_POCO="TRUE"
 
 # 检查是否在项目根目录
 if [ ! -f "CMakelists.txt" ]; then
@@ -23,9 +25,12 @@ echo "开始构建项目: $PROJECT_NAME"
 mkdir -p "$DEPS_DIR"
 
 # 下载和编译OpenSSL
-if [ ! -d "$DEPS_DIR/openssl-${OPENSSL_VERSION}" ]; then
-    echo "=== 下载和编译 OpenSSL ==="
+if [ "$NEED_BUILD_OPENSSL" = TRUE ]; then
     cd "$DEPS_DIR" || exit 1
+    rm -rf "openssl"
+    mkdir -p "openssl"
+    echo "=== 下载和编译 OpenSSL ==="
+    cd "openssl" || exit 1
     
     # 下载OpenSSL源码
     if [ ! -f "openssl-${OPENSSL_VERSION}.tar.gz" ]; then
@@ -38,6 +43,7 @@ if [ ! -d "$DEPS_DIR/openssl-${OPENSSL_VERSION}" ]; then
         tar -xzf "openssl-${OPENSSL_VERSION}.tar.gz"
     fi
     
+    rm -rf "openssl-${OPENSSL_VERSION}.tar.gz"
     cd "openssl-${OPENSSL_VERSION}" || exit 1
     
     # 创建构建目录
@@ -64,14 +70,13 @@ if [ ! -d "$DEPS_DIR/openssl-${OPENSSL_VERSION}" ]; then
 else
     echo "✅ OpenSSL 已存在，跳过编译"
 fi
-pwd
-rm  $DEPS_DIR/openssl-${OPENSSL_VERSION}.tar.gz
+cd ..
 
 # 下载和编译Poco
-if [ ! -d "$DEPS_DIR/poco/" ]; then
+if [ "$NEED_BUILD_POCO" = TRUE ]; then
     echo "=== 下载和编译 Poco ==="
-    mkdir -p "$DEPS_DIR/poco"
-    cd "$DEPS_DIR/poco" || exit 1
+    mkdir -p "poco"
+    cd "poco" || exit 1
     
     # 下载Poco源码
     if [ ! -f "poco-${POCO_VERSION}-release.zip" ]; then
@@ -85,38 +90,16 @@ if [ ! -d "$DEPS_DIR/poco/" ]; then
     
     cd "poco-poco-${POCO_VERSION}-release" || exit 1
     
-    # 使用Poco的CMake构建系统，禁用不需要的组件
-    mkdir -p cmake-build
-    cd cmake-build || exit 1
+    # 使用Poco的原生配置系统，指定OpenSSL路径
+    ./configure --omit=Data/MySQL,Data/ODBC \
+                --config=Darwin64 \
+                --prefix="$(pwd)" \
     
-    # 配置Poco（使用正确的CMake选项来省略某些组件）
-    cmake .. \
-        -DCMAKE_BUILD_TYPE=Release \
-        -DCMAKE_OSX_ARCHITECTURES="arm64" \
-        -DENABLE_NETSSL=ON \
-        -DENABLE_CRYPTO=ON \
-        -DENABLE_DATA=OFF \
-        -DENABLE_DATA_SQLITE=OFF \
-        -DENABLE_DATA_MYSQL=OFF \
-        -DENABLE_DATA_ODBC=OFF \
-        -DENABLE_PDF=OFF \
-        -DENABLE_PAGECOMPILER=OFF \
-        -DENABLE_PAGECOMPILER_FILE2PAGE=OFF \
-        -DENABLE_XML=ON \
-        -DENABLE_JSON=ON \
-        -DOPENSSL_ROOT_DIR="../../../openssl-${OPENSSL_VERSION}" \
-        -DOPENSSL_LIBRARIES="../../../openssl-${OPENSSL_VERSION}/lib" \
-        -DOPENSSL_INCLUDE_DIR="../../../openssl-${OPENSSL_VERSION}/include" \
-        -DPOCO_UNBUNDLED=ON \
-        -DENABLE_TESTS=OFF \
-        -DENABLE_SAMPLES=OFF
+    # 编译
+    make -s -j$(sysctl -n hw.ncpu)
     
-    make -j$(sysctl -n hw.ncpu)
-    
-    # 确保库文件在预期位置
-    if [ ! -d "../lib" ]; then
-        mkdir -p "../lib"
-    fi
+    # 安装到本地目录
+    make -s install
     
     cd ../..
     echo "✅ Poco 编译完成"
