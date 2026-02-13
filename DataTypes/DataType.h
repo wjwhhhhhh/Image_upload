@@ -10,5 +10,7 @@ namespace upload
         DataType_DataRead_Image=100,
 
         DataType_OriginalData_Image=200,
+
+        DataType_ProtectedData_Image=300,
     };
 } // namespace upload

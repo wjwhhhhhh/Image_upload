@@ -6,7 +6,8 @@ deps/
 *.exe
 *.out
 *.app
-
+*.jpg
+*.png
 # 对象文件
 *.o
 *.obj
