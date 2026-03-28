@@ -58,7 +58,7 @@ std::shared_ptr<IData> ImageDataRead::onOutputImageFile(std::shared_ptr<IData> d
     
     // 返回包含图像数据的对象（这里需要根据您的数据结构来调整）
     // 目前先返回原始的DataReadImage对象
-    auto originalImageData = std::make_shared<OriginalDataImage>(std::move(buffer));
+    auto originalImageData = std::make_shared<OriginalDataImage>(std::move(buffer),imageData->format_);
     return originalImageData;
 }
 void ImageDataRead::onInputImageFile(std::shared_ptr<IData> data)

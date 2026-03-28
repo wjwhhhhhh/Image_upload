@@ -7,8 +7,9 @@ namespace upload
     struct DataReadImage : public IData
     {
     public:
-        explicit DataReadImage(const std::string& filepath) : IData(DataType::DataType_DataRead_Image), filepath_(filepath) {}
+        explicit DataReadImage(const std::string &filepath, ImageFormat format = ImageFormat::ImageFormat_Unknown) : IData(DataType::DataType_DataRead_Image), filepath_(filepath), format_(format) {}
         virtual ~DataReadImage() = default;
         const std::string filepath_;
+        ImageFormat format_;
     };
 }

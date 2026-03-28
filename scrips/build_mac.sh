@@ -26,10 +26,10 @@ echo "开始构建项目: $PROJECT_NAME"
 
 # 创建依赖目录
 mkdir -p "$DEPS_DIR"
-
+cd "$DEPS_DIR" || exit 1
 # 下载和编译OpenSSL
 if [ "$NEED_BUILD_OPENSSL" = TRUE ]; then
-    cd "$DEPS_DIR" || exit 1
+
     rm -rf "openssl"
     mkdir -p "openssl"
     echo "=== 下载和编译 OpenSSL ==="
@@ -152,8 +152,8 @@ else
     echo "✅ Poco 已存在，跳过编译"
 fi
 
-cd PROJECT_ROOT_DIR || exit 1
-cd DEPS_DIR || exit 1
+pwd
+
 if [ "$NEED_BUILD_COSSDK" = TRUE ]; then
     echo "=== 下载和编译 COSSDK ==="
     mkdir -p "cossdk"

@@ -10,25 +10,49 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -O2")
 endif()
 
-# 查找源文件（排除CMakeFiles目录）
+# 定义本地依赖路径
+set(OPENSSL_LOCAL_PATH "${CMAKE_CURRENT_SOURCE_DIR}/deps/openssl/openssl-3.1.4")
+set(POCO_LOCAL_PATH "${CMAKE_CURRENT_SOURCE_DIR}/deps/poco/poco-static")
+
+# 设置 OpenSSL 本地路径
+set(OPENSSL_INCLUDE_DIR "${OPENSSL_LOCAL_PATH}/include")
+set(OPENSSL_BUILD_INCLUDE_DIR "${OPENSSL_LOCAL_PATH}/build/include")
+set(OPENSSL_CRYPTO_LIBRARY "${OPENSSL_LOCAL_PATH}/lib/libcrypto.a")
+set(OPENSSL_SSL_LIBRARY "${OPENSSL_LOCAL_PATH}/lib/libssl.a")
+
+# 查找源文件，排除特定目录
 file(GLOB_RECURSE SOURCES 
     "*.cpp"
     "*.c"
 )
-# 排除CMakeFiles目录中的文件
+
+# 排除 CMakeFiles 和 deps 目录
 list(FILTER SOURCES EXCLUDE REGEX ".*/CMakeFiles/.*")
+list(FILTER SOURCES EXCLUDE REGEX ".*/deps/.*")
+
+# 添加需要的 deps 源文件
+list(APPEND SOURCES
+    "${CMAKE_CURRENT_SOURCE_DIR}/deps/cJSON/cJSON.c"
+)
 
 # 创建可执行文件
-add_executable(${PROJECT_NAME} ${SOURCES}
-        deps/cJSON/cJSON.h
-        deps/cJSON/cJSON.c)
+add_executable(${PROJECT_NAME} ${SOURCES})
 
-# 包含目录（使用现代CMake语法）
+# 包含目录
 target_include_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/baseClass
     ${CMAKE_CURRENT_SOURCE_DIR}/NodeTypes
     ${CMAKE_CURRENT_SOURCE_DIR}/deps/cJSON
+    ${OPENSSL_INCLUDE_DIR}
+    ${OPENSSL_BUILD_INCLUDE_DIR}
+    ${POCO_LOCAL_PATH}/include
+)
+
+# 链接本地库
+target_link_libraries(${PROJECT_NAME} PRIVATE
+    ${OPENSSL_CRYPTO_LIBRARY}
+    ${OPENSSL_SSL_LIBRARY}
 )
 
 # 设置输出目录

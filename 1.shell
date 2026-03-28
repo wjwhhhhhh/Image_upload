@@ -1,0 +1,15 @@
+
+docker run \
+  --name manga_image_translator_cpu \
+  -p 5003:5003 \
+  --ipc=host \
+  --entrypoint python \
+  --rm \
+  -v /demo/doc/../../result:/app/result \
+  -v /demo/doc/../../server/main.py:/app/server/main.py \
+  -v /demo/doc/../../server/instance.py:/app/server/instance.py \
+  -e OPENAI_API_KEY='sk-f0f90ec8d5c3427c87c11cb64f1707a3' \
+  -e OPENAI_API_BASE='https://api.deepseek.com' \
+  -e OPENAI_MODEL='deepseek-chat' \
+  zyddnys/manga-image-translator:main \
+  server/main.py --verbose --start-instance --host=0.0.0.0 --port=5003  

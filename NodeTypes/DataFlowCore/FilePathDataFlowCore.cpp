@@ -1,6 +1,7 @@
 #include "FilePathDataFlowCore.h"
 #include "../../deps/cJSON/cJSON.h"
 #include "../../DataTypes/DataRead/DataReadImage.h"
+#include "../../utils/TypeUtils.h"
 using namespace upload;
 
 // 定义静态成员变量
@@ -29,5 +30,6 @@ std::shared_ptr<IData> FilePathDataFlowCore::onOutputImageFile(std::shared_ptr<I
     std::string filepathStr = filepath->valuestring;
     std::cout << "filepathStr: " << filepathStr << std::endl;
     cJSON_Delete(json);
-    return std::make_shared<DataReadImage>(filepathStr);
+
+    return std::make_shared<DataReadImage>(filepathStr, getImageFormatFromFilePath(filepathStr));
 }
